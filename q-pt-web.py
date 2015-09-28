@@ -12,7 +12,7 @@ async def get(url, token, data = None):
     res = await aiohttp.get(url, headers=hs, params=data)
     return json.loads( await res.text() )
 
-async def get_releases(name, prj_id, token, q):
+async def get_releases(name, prj_id, token, q, p):
 
     rs = []
     offset = 0
@@ -27,7 +27,8 @@ async def get_releases(name, prj_id, token, q):
 
         data = await get(url, token, data)
 
-        print(offset, len(data))
+        await p.put(
+                (offset, len(data)))
 
         if (len(data)):
             rs.extend(data)
@@ -41,26 +42,36 @@ async def get_releases(name, prj_id, token, q):
             (name, len(rs)))
 
 
+async def progress(p):
+    
+    while True:
+        print(await p.get())
+
 async def main(token):
 
     data = await get(pt_url, token)
 
     [print(p['id'], p['name']) for p in data]
 
-    q = asyncio.Queue(maxsize=len(data))
+    qu = asyncio.Queue(maxsize=len(data))
+    pr = asyncio.Queue()
+
+    pr_t = asyncio.ensure_future(progress(pr))
 
     await asyncio.wait([
 
             get_releases(
-                p['name'], p['id'], token, q
+                p['name'], p['id'], token, qu, pr
                 ) for p in data    
 
         ])
 
     for i in range(0,len(data)):
 
-            r = await q.get()
+            r = await qu.get()
             print(*r)
+
+    pr_t.cancel()
 
 
 loop = asyncio.get_event_loop()
