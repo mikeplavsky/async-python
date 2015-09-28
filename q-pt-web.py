@@ -28,7 +28,7 @@ async def get_releases(name, prj_id, token, q, p):
         data = await get(url, token, data)
 
         await p.put(
-                (offset, len(data)))
+                (prj_id, offset, len(data)))
 
         if (len(data)):
             rs.extend(data)
