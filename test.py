@@ -3,7 +3,7 @@ import sys
 
 async def slow_op(n):
 
-    await asyncio.sleep(1)
+    await asyncio.sleep(5)
     print("Done", n)
 
 async def main():
