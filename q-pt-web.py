@@ -23,6 +23,7 @@ async def get_releases(name, prj_id, token, q, p):
         
         data = dict(
                 scope="current_backlog", 
+                limit=100,
                 offset=offset)
 
         data = await get(url, token, data)
@@ -36,7 +37,7 @@ async def get_releases(name, prj_id, token, q, p):
         else:
             break
 
-        offset += 10
+        offset += len(data)
 
     await q.put(
             (name, len(rs)))
