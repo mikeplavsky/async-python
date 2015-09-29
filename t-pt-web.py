@@ -1,5 +1,6 @@
 from urllib import request, parse
 from threading import Thread
+import queue
 
 import json
 import sys
@@ -17,7 +18,7 @@ def get(url, token):
     return  json.loads(
             raw.read().decode("utf-8"))
 
-def get_releases(name, prj_id, token):
+def get_releases(name, prj_id, token, q, p):
 
     url = "%s/%s/iterations?" % (pt_url, prj_id) 
 
@@ -33,7 +34,7 @@ def get_releases(name, prj_id, token):
                     offset=offset))
 
         data = get(url+params, token)
-        print(prj_id, offset, len(data))
+        p.put((prj_id, offset, len(data)))
 
         if len(data):
             iters.extend(data)
@@ -43,21 +44,42 @@ def get_releases(name, prj_id, token):
 
         offset += len(data)
 
-    return iters
+    q.put((name, len(iters)))
 
 def main(token):
 
     res = get(pt_url, token)
     [print(p['id'], p['name']) for p in res]
 
+    qu = queue.Queue()
+    pr = queue.Queue()
+
     threads = [
         Thread(
             target=get_releases,
-            args=(p['name'], p['id'], token)) for p in res
+            args=(
+                p['name'], 
+                p['id'], 
+                token, qu, pr)) for p in res
     ]
+
+    def progress():
+
+        while True:
+           print(pr.get())
+
+    pt = Thread(target=progress)
+
+    pt.daemon = True
+    pt.start()
 
     [t.start() for t in threads]
     [t.join() for t in threads]
+
+    for t in threads:
+
+        r = qu.get()
+        print(r)
 
 main(sys.argv[1])
 
