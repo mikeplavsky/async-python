@@ -4,7 +4,7 @@ import sys
 
 def slow_op(n):
     
-    time.sleep(5)
+    time.sleep(30)
     print("Done", n)
 
 threads = []
