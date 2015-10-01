@@ -2,21 +2,36 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"strconv"
 	"time"
 )
 
 func tick(i int, done chan<- bool) {
 
-	time.Sleep(1000 * time.Millisecond)
+	time.Sleep(5000 * time.Millisecond)
 	fmt.Println(i)
+
+	done <- true
 
 }
 
 func main() {
 
-	done := make(chan bool)
-	go tick(1, done)
+	times, _ := strconv.Atoi(os.Args[1])
 
-	<-done
+	done := make(chan bool)
+
+	for i := 0; i < times; i++ {
+
+		go func(i int) {
+			tick(i, done)
+		}(i)
+
+	}
+
+	for i := 0; i < times; i++ {
+		<-done
+	}
 
 }
