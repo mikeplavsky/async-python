@@ -1,6 +1,8 @@
+*.exe
 cs-web/build
 cs-web/obj
 cs-web/packages
 cs-web/bin
+cs-web/.vs
 *.swp
 *.swo

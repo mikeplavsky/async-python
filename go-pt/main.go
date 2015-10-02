@@ -49,7 +49,7 @@ func get_releases(name string,
 
 		url := fmt.Sprintf(
 
-			"%v/%v/iterations?scope=current_backlog&offset=%v",
+			"%v/%v/iterations?scope=current_backlog&limit=100&offset=%v",
 			pt_url,
 			proj_id,
 			offset)
@@ -99,14 +99,14 @@ func main() {
 			name, id, token, r, pr)
 	}
 
-        i := []info {}
+	i := []info{}
 
 	for _, _ = range data {
 		i = append(i, <-r)
 	}
 
-        for _, p := range i {
-            fmt.Println(p)
-        }
+	for _, p := range i {
+		fmt.Println(p)
+	}
 
 }
