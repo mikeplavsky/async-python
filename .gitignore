@@ -1,2 +1,6 @@
+cs-web/build
+cs-web/obj
+cs-web/packages
+cs-web/bin
 *.swp
 *.swo
