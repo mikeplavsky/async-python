@@ -39,11 +39,14 @@ async def get_releases(name, prj_id, token):
 
     return (name, len(rs))
 
+async def projects(token):
+
+    data = await get(pt_url, token)
+    [print(p['id'], p['name']) for p in data]
 
 async def main(token):
 
     data = await get(pt_url, token)
-
     [print(p['id'], p['name']) for p in data]
 
     done, _ = await asyncio.wait([
@@ -57,5 +60,20 @@ async def main(token):
     [print(*r.result()) for r in done]
 
 
+import os
+
+token = os.environ["PT_TOKEN"]
+project = os.environ.get("PT_PROJECT")
+
 loop = asyncio.get_event_loop()
-loop.run_until_complete(main(sys.argv[1]))
+
+
+if not project: 
+
+    loop.run_until_complete(
+            projects(token))
+
+else:
+
+    print(project)
+
